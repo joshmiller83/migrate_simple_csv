@@ -116,6 +116,12 @@ class SimpleCSVenMigrate extends SimpleCSVBasicMigration {
     $this->addFieldMapping(NULL, 'description-fr')
          ->description('Not needed yet.');
   }
+
+  public function complete($entity, stdClass $row) {
+    // Put the tnid for english content after it is created.
+    $entity->tnid = $entity->nid;
+    node_save($entity);
+  }
 }
 
 
