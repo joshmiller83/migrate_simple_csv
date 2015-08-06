@@ -23,7 +23,7 @@ function migrate_example_baseball_migrate_api() {
 /**
  * A migration that is reused for each source CSV file.
  */
-class SimpleCSV extends Migration
+class SimpleCSV extends Migration {
   public function __construct($arguments) {
     // Run the parent first
     parent::__construct($arguments);
