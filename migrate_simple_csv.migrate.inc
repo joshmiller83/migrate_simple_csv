@@ -48,15 +48,15 @@ class SimpleCSV extends Migration {
     // Create a MigrateSource object, which manages retrieving the input data.
     $this->source = new MigrateSourceCSV($arguments['source_file'],
                                          $this->csvcolumns(),
-                                         array(),
+                                         array("header_rows" => 1),
                                          $this->fields());
 
     // Add destination to standard basic page content type
     $this->destination = new MigrateDestinationNode('page');
 
-    $this->addFieldMapping(NULL, 'uuid')
+    $this->addFieldMapping(NULL, 'UUID')
          ->description('Simple unique id for tracking once imported.');
-    $this->addFieldMapping('title', 'title');
+    $this->addFieldMapping('Title', 'Title');
     $this->addFieldMapping('body', 'description-en');
     $this->addFieldMapping(NULL, 'description-fr')
          ->description('Not needed yet.');
@@ -72,7 +72,7 @@ class SimpleCSV extends Migration {
   }
 
   public function prepareRow($row) {
-    $row->title = $row->title." ".gmdate('M d, Y', now());
+    $row->Title = $row->Title." ".date('M d, Y');
   }
 
   /**
@@ -83,14 +83,9 @@ class SimpleCSV extends Migration {
                                       PATHINFO_FILENAME));
   }
 
-  /* Not sure what this does */
+  /* Only add generated fields */
   public function fields() {
-    return array(
-      'UUID' => 'A unique key for tracking imports',
-      'title' => 'A composite field made during prepareRow().',
-      'description-en' => 'Body in English',
-      'description-fr' => 'Body in French',
-    );
+    return array();
   }
   
 }
