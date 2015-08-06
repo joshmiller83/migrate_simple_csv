@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Set up the migration csv simple module.
+ */
+function migrate_example_baseball_enable() {
+  $path = dirname(__FILE__) . '/source';
+  $file = 'csv_simple.csv';
+  Migration::registerMigration('SimpleCSV',
+    pathinfo($file, PATHINFO_FILENAME),
+    array('source_file' => $path . '/' . $file, 'group_name' => 'simple_csv'));
+}
