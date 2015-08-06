@@ -36,8 +36,8 @@ class SimpleCSV extends Migration {
     // arg 3: Destination Key
     $this->map = new MigrateSQLMap($this->machineName,
       array(
-        'UUID' => array('type' => 'int',
-                         'size' => 'normal',
+        'UUID' => array('type' => 'varchar',
+                         'length' => 255,
                          'not null' => TRUE,
                          'description' => 'UUID',
                         ),
