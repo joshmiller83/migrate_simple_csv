@@ -56,8 +56,10 @@ class SimpleCSV extends Migration {
 
     $this->addFieldMapping(NULL, 'UUID')
          ->description('Simple unique id for tracking once imported.');
-    $this->addFieldMapping('Title', 'Title');
+    $this->addFieldMapping('title', 'Title');
     $this->addFieldMapping('body', 'description-en');
+    $this->addFieldMapping('language')
+         ->defaultValue('en');
     $this->addFieldMapping(NULL, 'description-fr')
          ->description('Not needed yet.');
   }
@@ -72,7 +74,7 @@ class SimpleCSV extends Migration {
   }
 
   public function prepareRow($row) {
-    $row->Title = $row->Title." ".date('M d, Y');
+    $row->Title = $row->Title." ".date('U');
   }
 
   /**
