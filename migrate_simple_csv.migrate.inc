@@ -39,33 +39,15 @@ function migrate_simple_csv_migrate_api() {
  * Abstract class as a base for all our migration classes.
  */
 class SimpleCSVBasicMigration extends Migration {
-
-}
-
-/**
- * A migration that is reused for each source CSV file.
- */
-class SimpleCSV extends Migration {
   public function __construct($arguments) {
-    // Run the parent first
+    // Always call the parent constructor first for basic setup
     parent::__construct($arguments);
-    $this->description = t('Import 10 simple nodes from CSV file.');
 
-    // Create a map object for tracking the relationships between source rows
-    // Only tracking the UUID and the node id relationship.
-    // arg 1: Machine Name
-    // arg 2: Source Key
-    // arg 3: Destination Key
-    $this->map = new MigrateSQLMap($this->machineName,
-      array(
-        'UUID' => array('type' => 'varchar',
-                         'length' => 255,
-                         'not null' => TRUE,
-                         'description' => 'UUID',
-                        ),
-      ),
-      MigrateDestinationNode::getKeySchema()
-    );
+    // Avoid known line ending issue: "Invalid data value" at drupal.org/node/1152158#InvalidDataValue
+    ini_set('auto_detect_line_endings', TRUE);
+
+
+    $this->description = t('Import 10 simple nodes from CSV file.');
 
     // Create a MigrateSource object, which manages retrieving the input data.
     $this->source = new MigrateSourceCSV($arguments['source_file'],
@@ -79,11 +61,6 @@ class SimpleCSV extends Migration {
     $this->addFieldMapping(NULL, 'UUID')
          ->description('Simple unique id for tracking once imported.');
     $this->addFieldMapping('title', 'Title');
-    $this->addFieldMapping('body', 'description-en');
-    $this->addFieldMapping('language')
-         ->defaultValue('en');
-    $this->addFieldMapping(NULL, 'description-fr')
-         ->description('Not needed yet.');
   }
 
   protected function csvcolumns() {
@@ -95,11 +72,6 @@ class SimpleCSV extends Migration {
     return $columns;
   }
 
-  public function prepareRow($row) {
-    $row->Title = $row->Title." ".date('U');
-    dpm($this->findReferencedNid($row->body));
-  }
-
   /**
    * Construct the machine name from the source file name.
    */
@@ -108,9 +80,78 @@ class SimpleCSV extends Migration {
                                       PATHINFO_FILENAME));
   }
 
-  /* Only add generated fields */
+  /* Add fields that are not mapped. */
   public function fields() {
     return array();
   }
-  
+}
+
+/**
+ * A migration that is reused for each source CSV file.
+ */
+class SimpleCSVenMigrate extends SimpleCSVBasicMigration {
+  public function __construct($arguments) {
+    // Run the parent first
+    parent::__construct($arguments);
+
+
+
+    // Primary Key
+    $this->map = new MigrateSQLMap($this->machineName,
+      array(
+        'UUID' => array('type' => 'varchar', // This field is used to track nodes between imports
+                         'length' => 6,
+                         'not null' => TRUE,
+                         'description' => 'UUID',
+                        ),
+      ),
+      MigrateDestinationNode::getKeySchema()
+    );
+
+    // Field Mapping for English
+    $this->addFieldMapping('body', 'description-en');
+    $this->addFieldMapping('language')
+         ->defaultValue('en');
+    $this->addFieldMapping(NULL, 'description-fr')
+         ->description('Not needed yet.');
+  }
+}
+
+
+
+/**
+ * A migration that is reused for each source CSV file.
+ */
+class SimpleCSVfrMigrate extends SimpleCSVBasicMigration {
+  public function __construct($arguments) {
+    // Run the parent first
+    parent::__construct($arguments);
+
+
+
+    // Primary Key
+    $this->map = new MigrateSQLMap($this->machineName,
+      array(
+        'UUID' => array('type' => 'varchar', // This field is used to track nodes between imports
+                         'length' => 6,
+                         'not null' => TRUE,
+                         'description' => 'UUID',
+                        ),
+      ),
+      MigrateDestinationNode::getKeySchema()
+    );
+
+    // Declare English migration as a dependency
+    $this->dependencies = array('SimpleCSVenMigrate');
+
+    // Field Mapping for French
+    $this->addFieldMapping('tnid', 'UUID')
+         ->sourceMigration('SimpleCSVenMigrate')
+         ->description('Connecting this node to the english default version.');
+    $this->addFieldMapping(NULL, 'description-en');
+    $this->addFieldMapping('language')
+         ->defaultValue('fr');
+    $this->addFieldMapping('body', 'description-fr')
+         ->description('Not needed yet.');
+  }
 }

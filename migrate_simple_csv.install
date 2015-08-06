@@ -26,4 +26,6 @@ function migrate_simple_csv_enable() {
  */
 function migrate_simple_csv_disable() {
   MigrateGroup::deregister('simple_csv');
+  MigrateGroup::deregister('SimpleCSVenMigrate');
+  MigrateGroup::deregister('SimpleCSVfrMigrate');
 }
