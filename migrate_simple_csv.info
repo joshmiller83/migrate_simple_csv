@@ -1,0 +1,7 @@
+name = "migrate_simple_csv"
+package = "Migration"
+version = "7.x-1.0"
+core = "7.x"
+
+dependencies[] = "migrate"
+files[] = "migrate_simple_csv.migrate.inc"
