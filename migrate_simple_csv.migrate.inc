@@ -36,10 +36,10 @@ class SimpleCSV extends Migration
     // arg 3: Destination Key
     $this->map = new MigrateSQLMap($this->machineName,
       array(
-        'uuid' => array('type' => 'int',
+        'UUID' => array('type' => 'int',
                          'size' => 'normal',
                          'not null' => TRUE,
-                         'description' => 'uuid',
+                         'description' => 'UUID',
                         ),
       ),
       MigrateDestinationNode::getKeySchema()
@@ -63,14 +63,16 @@ class SimpleCSV extends Migration
   }
 
   protected function csvcolumns() {
-    $columns[0] = array('start_date', 'Date of game');
-    $columns[1] = array('visiting_team', 'Visiting team');
+    $columns[0] = array('UUID', 'UUID');
+    $columns[1] = array('Title', 'Title');
+    $columns[2] = array('description-en', 'description-en');
+    $columns[3] = array('description-fr', 'description-fr');
 
     return $columns;
   }
 
   public function prepareRow($row) {
-  
+    $row->title = $row->title." ".gmdate('M d, Y', now());
   }
 
   /**
@@ -79,6 +81,16 @@ class SimpleCSV extends Migration
   protected function generateMachineName($class_name = NULL) {
     return drupal_strtolower(pathinfo($this->arguments['source_file'],
                                       PATHINFO_FILENAME));
+  }
+
+  /* Not sure what this does */
+  public function fields() {
+    return array(
+      'UUID' => 'A unique key for tracking imports',
+      'title' => 'A composite field made during prepareRow().',
+      'description-en' => 'Body in English',
+      'description-fr' => 'Body in French',
+    );
   }
   
 }
