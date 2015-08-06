@@ -33,6 +33,7 @@ function migrate_simple_csv_migrate_api() {
       ),
     ),
   );
+  return $api;
 }
 
 /**
