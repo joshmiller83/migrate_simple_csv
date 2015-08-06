@@ -2,22 +2,44 @@
 
 /**
  * @file
- *   A baseball game migration example.
+ *   A csv simple importer for Josh to learn.
  */
 
 
-/*
- * Implement hook_migrate_api()
+/**
+ * Implements hook_migrate_api()
+ *
+ * Returns 'api' => 2 for the 7.x-2.x branch of Migrate.
+ * Registers the migration classes for the 7.x-2.6 branch of Migrate (including
+ * 7.x-2.6+xx-dev).
  */
-function migrate_example_baseball_migrate_api() {
+function migrate_simple_csv_migrate_api() {
   $api = array(
     'api' => 2,
+    // register a group
     'groups' => array(
       'simple_csv' => array(
         'title' => t('Simple CSV import to Basic Page'),
       ),
     ),
+    'migrations' => array(
+      'SimpleCSVenMigrate' => array(
+        'class_name' => 'SimpleCSVenMigrate',
+        'group_name' => 'simple_csv',
+      ),
+      'SimpleCSVfrMigrate' => array(
+        'class_name' => 'SimpleCSVfrMigrate',
+        'group_name' => 'simple_csv',
+      ),
+    ),
   );
+}
+
+/**
+ * Abstract class as a base for all our migration classes.
+ */
+class SimpleCSVBasicMigration extends Migration {
+
 }
 
 /**
@@ -75,6 +97,7 @@ class SimpleCSV extends Migration {
 
   public function prepareRow($row) {
     $row->Title = $row->Title." ".date('U');
+    dpm($this->findReferencedNid($row->body));
   }
 
   /**
