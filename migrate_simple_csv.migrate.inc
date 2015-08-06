@@ -51,7 +51,7 @@ class SimpleCSVBasicMigration extends Migration {
     $this->description = t('Import 10 simple nodes from CSV file.');
 
     // Create a MigrateSource object, which manages retrieving the input data.
-    $this->source = new MigrateSourceCSV($arguments['source_file'],
+    $this->source = new MigrateSourceCSV(DRUPAL_ROOT . '/' . drupal_get_path('module', 'migrate_simple_csv') . '/source/csv_simple.csv',
                                          $this->csvcolumns(),
                                          array("header_rows" => 1),
                                          $this->fields());
@@ -77,7 +77,7 @@ class SimpleCSVBasicMigration extends Migration {
    * Construct the machine name from the source file name.
    */
   protected function generateMachineName($class_name = NULL) {
-    return drupal_strtolower(pathinfo($this->arguments['source_file'],
+    return drupal_strtolower(pathinfo(DRUPAL_ROOT . '/' . drupal_get_path('module', 'migrate_simple_csv') . '/source/csv_simple.csv',
                                       PATHINFO_FILENAME));
   }
 
